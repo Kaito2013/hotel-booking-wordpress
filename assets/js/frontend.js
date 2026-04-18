@@ -320,10 +320,9 @@
 				contentType: 'application/json',
 				success: function(response) {
 					if (response.success) {
-						closeBookingModal();
-						showMessage('Booking created successfully! You will receive a confirmation email.', 'success');
-						// Refresh room list
-						$('.hb-search-form').trigger('submit');
+						// Redirect to booking confirmation page
+						var confirmationUrl = '/booking-confirmation?booking_id=' + response.booking_id;
+						window.location.href = confirmationUrl;
 					} else {
 						showMessage('Error creating booking: ' + (response.message || 'Unknown error'), 'error');
 					}

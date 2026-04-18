@@ -43,6 +43,7 @@ class Hotel_Booking_Frontend {
 		add_shortcode( 'hotel_booking_rooms', array( $this, 'render_rooms_list' ) );
 		add_shortcode( 'hotel_booking_room_detail', array( $this, 'render_room_detail' ) );
 		add_shortcode( 'hotel_booking_my_bookings', array( $this, 'render_my_bookings' ) );
+		add_shortcode( 'hotel_booking_confirmation', array( $this, 'render_booking_confirmation' ) );
 		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
 		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 	}
@@ -200,6 +201,12 @@ class Hotel_Booking_Frontend {
 			'top'
 		);
 
+		add_rewrite_rule(
+			'^booking-confirmation/?$',
+			'index.php?hb_page=booking-confirmation',
+			'top'
+		);
+
 		add_rewrite_tag( '%hb_room_id%', '([^&]+)' );
 		add_rewrite_tag( '%hb_page%', '([^&]+)' );
 	}
@@ -220,6 +227,11 @@ class Hotel_Booking_Frontend {
 
 		if ( 'my-bookings' === $page ) {
 			$this->render_my_bookings_page();
+			exit;
+		}
+
+		if ( 'booking-confirmation' === $page ) {
+			$this->render_booking_confirmation_page();
 			exit;
 		}
 	}
@@ -273,6 +285,21 @@ class Hotel_Booking_Frontend {
 	 */
 	private function render_my_bookings_page() {
 		$template_path = HOTEL_BOOKING_PLUGIN_DIR . 'templates/my-bookings.php';
+
+		if ( file_exists( $template_path ) ) {
+			include $template_path;
+		} else {
+			wp_die( 'Template not found', 'Template Not Found', array( 'response' => 500 ) );
+		}
+	}
+
+	/**
+	 * Render booking confirmation page.
+	 *
+	 * @return void
+	 */
+	private function render_booking_confirmation_page() {
+		$template_path = HOTEL_BOOKING_PLUGIN_DIR . 'templates/booking-confirmation.php';
 
 		if ( file_exists( $template_path ) ) {
 			include $template_path;
@@ -344,6 +371,35 @@ class Hotel_Booking_Frontend {
 
 		ob_start();
 		include HOTEL_BOOKING_PLUGIN_DIR . 'templates/my-bookings.php';
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render booking confirmation shortcode.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_booking_confirmation( $atts ) {
+		$atts = shortcode_atts(
+			array(
+				'booking_id' => 0,
+			),
+			$atts
+		);
+
+		$booking_id = absint( $atts['booking_id'] );
+
+		if ( ! $booking_id ) {
+			$booking_id = isset( $_GET['booking_id'] ) ? absint( $_GET['booking_id'] ) : 0;
+		}
+
+		if ( ! $booking_id ) {
+			return '<div class="hb-message error">Booking ID is required.</div>';
+		}
+
+		ob_start();
+		include HOTEL_BOOKING_PLUGIN_DIR . 'templates/booking-confirmation.php';
 		return ob_get_clean();
 	}
 }
