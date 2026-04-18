@@ -90,6 +90,24 @@ $email_settings = array(
 						<input type="time" id="hb-default-check-out" name="hb_default_check_out" value="<?php echo esc_attr( $general_settings['default_check_out'] ); ?>" class="regular-text">
 					</td>
 				</tr>
+				<tr>
+					<th scope="row">
+						<label for="hb-contact-email"><?php esc_html_e( 'Contact Email', 'hotel-booking' ); ?></label>
+					</th>
+					<td>
+						<input type="email" id="hb-contact-email" name="hb_contact_email" value="<?php echo esc_attr( get_option( 'hb_contact_email', get_bloginfo( 'admin_email' ) ) ); ?>" class="regular-text">
+						<p class="description"><?php esc_html_e( 'Email address displayed on booking confirmation page for customer support.', 'hotel-booking' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="hb-contact-phone"><?php esc_html_e( 'Contact Phone', 'hotel-booking' ); ?></label>
+					</th>
+					<td>
+						<input type="tel" id="hb-contact-phone" name="hb_contact_phone" value="<?php echo esc_attr( get_option( 'hb_contact_phone', '' ) ); ?>" class="regular-text">
+						<p class="description"><?php esc_html_e( 'Phone number displayed on booking confirmation page for customer support.', 'hotel-booking' ); ?></p>
+					</td>
+				</tr>
 			</table>
 
 			<p class="submit">

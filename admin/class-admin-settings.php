@@ -52,6 +52,8 @@ class Hotel_Booking_Admin_Settings {
 		register_setting( 'hb_general_settings', 'hb_currency_symbol' );
 		register_setting( 'hb_general_settings', 'hb_default_check_in' );
 		register_setting( 'hb_general_settings', 'hb_default_check_out' );
+		register_setting( 'hb_general_settings', 'hb_contact_email' );
+		register_setting( 'hb_general_settings', 'hb_contact_phone' );
 
 		// Payment Settings
 		register_setting( 'hb_payment_settings', 'hb_stripe_enabled' );
