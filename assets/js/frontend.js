@@ -351,6 +351,10 @@
 
 		if ($('.hb-room-list').length) {
 			$('.hb-room-list').before(messageHtml);
+		} else if ($('.hb-room-detail').length) {
+			$('.hb-room-detail').before(messageHtml);
+		} else if ($('.hb-my-bookings').length) {
+			$('.hb-my-bookings').prepend(messageHtml);
 		} else {
 			$('.hb-booking-container').prepend(messageHtml);
 		}
@@ -362,6 +366,277 @@
 			});
 		}, 5000);
 	}
+
+	// Room Detail Page
+	function initRoomDetailPage() {
+		if (!$('.hb-room-detail').length) return;
+
+		initRoomGallery();
+		initRoomBookingForm();
+		initMiniCalendar();
+	}
+
+	// Room Gallery
+	function initRoomGallery() {
+		$('.hb-gallery-thumb').on('click', function() {
+			var $thumb = $(this);
+			var $mainImage = $('#hb-main-room-image');
+
+			// Update main image
+			$mainImage.attr('src', $thumb.data('large'));
+
+			// Update active state
+			$('.hb-gallery-thumb').removeClass('active');
+			$thumb.addClass('active');
+		});
+	}
+
+	// Room Booking Form
+	function initRoomBookingForm() {
+		var $form = $('#hb-room-booking-form');
+
+		if (!$form.length) return;
+
+		// Calculate price on form change
+		$form.on('change', 'input[name="check_in"], input[name="check_out"]', function() {
+			updateRoomBookingSummary();
+		});
+
+		// Initial calculation
+		updateRoomBookingSummary();
+
+		// Form submission
+		$form.on('submit', function(e) {
+			e.preventDefault();
+
+			var formData = $(this).serialize();
+			var $button = $form.find('.hb-submit-btn');
+
+			// Disable button
+			$button.prop('disabled', true).text('Processing...');
+
+			// Redirect to booking page with parameters
+			var room_id = $form.find('input[name="room_id"]').val();
+			var check_in = $form.find('input[name="check_in"]').val();
+			var check_out = $form.find('input[name="check_out"]').val();
+			var guests = $form.find('input[name="guests"]').val();
+
+			// Store booking data in sessionStorage
+			sessionStorage.setItem('hb_booking_data', JSON.stringify({
+				room_id: room_id,
+				check_in: check_in,
+				check_out: check_out,
+				guests: guests
+			}));
+
+			// Navigate to main booking page
+			window.location.href = window.location.pathname + '?booking=1&room_id=' + room_id +
+				'&check_in=' + encodeURIComponent(check_in) +
+				'&check_out=' + encodeURIComponent(check_out) +
+				'&guests=' + guests;
+		});
+	}
+
+	function updateRoomBookingSummary() {
+		var checkIn = $('#room_check_in').val();
+		var checkOut = $('#room_check_out').val();
+
+		if (checkIn && checkOut) {
+			var nights = calculateNights(checkIn, checkOut);
+			var pricePerNight = parseFloat($('.hb-price-per-night').text().replace(/[^0-9.]/g, ''));
+			var total = pricePerNight * nights;
+
+			$('#summary-check-in').text(checkIn);
+			$('#summary-check-out').text(checkOut);
+			$('#summary-nights').text(nights);
+			$('#summary-total').text(hotelBooking.currencySymbol + total.toFixed(2));
+		}
+	}
+
+	function calculateNights(checkIn, checkOut) {
+		var checkInDate = new Date(checkIn);
+		var checkOutDate = new Date(checkOut);
+		return Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+	}
+
+	// Mini Calendar
+	function initMiniCalendar() {
+		var $container = $('#hb-mini-calendar');
+		if (!$container.length) return;
+
+		var roomId = $('input[name="room_id"]').val();
+		var currentDate = new Date();
+		var currentMonth = currentDate.getFullYear() + '-' + String(currentDate.getMonth() + 1).padStart(2, '0');
+
+		loadMiniCalendar(roomId, currentMonth);
+	}
+
+	function loadMiniCalendar(roomId, month) {
+		var $container = $('#hb-mini-calendar');
+		$container.html('<div class="hb-loading"><div class="spinner"></div>Loading...</div>');
+
+		var apiUrl = hotelBooking.restUrl + 'availability?room_id=' + roomId + '&month=' + month;
+
+		$.get(apiUrl, function(response) {
+			if (response.available_dates) {
+				renderMiniCalendar(response, month);
+			}
+		}).fail(function() {
+			$container.html('<p>Error loading calendar</p>');
+		});
+	}
+
+	function renderMiniCalendar(data, month) {
+		var $container = $('#hb-mini-calendar');
+		var date = new Date(month + '-01');
+		var year = date.getFullYear();
+		var monthNum = date.getMonth();
+
+		var firstDay = new Date(year, monthNum, 1);
+		var lastDay = new Date(year, monthNum + 1, 0);
+
+		var daysInMonth = lastDay.getDate();
+		var startDay = firstDay.getDay();
+
+		var dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+		var html = '<div class="hb-mini-calendar-grid">';
+
+		// Header
+		html += '<div class="hb-mini-calendar-header">';
+		for (var i = 0; i < 7; i++) {
+			html += '<span>' + dayNames[i] + '</span>';
+		}
+		html += '</div>';
+
+		// Days
+		for (var day = 1; day <= daysInMonth; day++) {
+			var dateStr = year + '-' + String(monthNum + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+			var isAvailable = data.available_dates.includes(dateStr);
+			var isPast = new Date(dateStr) < new Date(new Date().setHours(0,0,0,0));
+
+			html += '<div class="hb-mini-day ' +
+				(isAvailable ? 'available' : 'unavailable') +
+				(isPast ? ' past' : '') +
+				'">';
+			html += day;
+			html += '</div>';
+		}
+
+		html += '</div>';
+
+		// Add legend
+		html += '<div class="hb-mini-calendar-legend">';
+		html += '<div class="hb-legend-item"><span class="hb-legend-dot available"></span> Available</div>';
+		html += '<div class="hb-legend-item"><span class="hb-legend-dot unavailable"></span> Booked</div>';
+		html += '</div>';
+
+		$container.html(html);
+	}
+
+	// My Bookings Page
+	function initMyBookingsPage() {
+		if (!$('.hb-my-bookings').length) return;
+
+		// Cancel booking
+		$('.hb-cancel-booking').on('click', function(e) {
+			e.preventDefault();
+
+			var bookingId = $(this).data('booking-id');
+			$('#cancel-booking-id').val(bookingId);
+			$('#hb-cancel-modal').show();
+		});
+
+		// Close cancel modal
+		$('#hb-cancel-modal .hb-modal-close').on('click', function() {
+			$('#hb-cancel-modal').hide();
+		});
+
+		$('#hb-cancel-modal').on('click', function(e) {
+			if ($(e.target).hasClass('hb-modal-overlay')) {
+				$(this).hide();
+			}
+		});
+
+		// Submit cancel form
+		$('#hb-cancel-booking-form').on('submit', function(e) {
+			e.preventDefault();
+
+			var bookingId = $('#cancel-booking-id').val();
+			var reason = $('#cancel-reason').val();
+
+			cancelBooking(bookingId, reason);
+		});
+
+		// View booking details (placeholder)
+		$('.hb-view-booking').on('click', function(e) {
+			e.preventDefault();
+			var bookingId = $(this).data('booking-id');
+			showMessage('Booking details view coming soon', 'info');
+		});
+
+		// Download receipt (placeholder)
+		$('.hb-download-receipt').on('click', function(e) {
+			e.preventDefault();
+			var bookingId = $(this).data('booking-id');
+			showMessage('Receipt download coming soon', 'info');
+		});
+	}
+
+	function cancelBooking(bookingId, reason) {
+		$.ajax({
+			url: hotelBooking.restUrl + 'bookings/' + bookingId + '/cancel',
+			type: 'POST',
+			headers: {
+				'X-WP-Nonce': hotelBooking.nonce
+			},
+			data: JSON.stringify({ reason: reason }),
+			contentType: 'application/json',
+			success: function(response) {
+				$('#hb-cancel-modal').hide();
+				showMessage('Booking cancelled successfully', 'success');
+				// Reload page after short delay
+				setTimeout(function() {
+					location.reload();
+				}, 1500);
+			},
+			error: function(xhr) {
+				var errorMsg = 'Error cancelling booking';
+				if (xhr.responseJSON && xhr.responseJSON.message) {
+					errorMsg = xhr.responseJSON.message;
+				}
+				showMessage(errorMsg, 'error');
+			}
+		});
+	}
+
+	// Update init() to include new features
+	var originalInit = init;
+	init = function() {
+		originalInit();
+		initRoomDetailPage();
+		initMyBookingsPage();
+
+		// Check for booking data in sessionStorage
+		var bookingData = sessionStorage.getItem('hb_booking_data');
+		if (bookingData && window.location.search.includes('booking=1')) {
+			sessionStorage.removeItem('hb_booking_data');
+			var data = JSON.parse(bookingData);
+
+			// Pre-fill search form
+			$('#check_in').val(data.check_in);
+			$('#check_out').val(data.check_out);
+			$('[name="guests"]').val(data.guests);
+
+			// Trigger search
+			$('.hb-search-form').trigger('submit');
+
+			// Open booking modal for the room
+			$(document).on('click', '.hb-book-btn[data-room-id="' + data.room_id + '"]', function() {
+				// Room detail page form already has data
+			});
+		}
+	};
 
 	// Initialize on document ready
 	$(document).ready(function() {

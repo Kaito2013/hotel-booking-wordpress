@@ -114,11 +114,23 @@ class Hotel_Booking_REST_API {
 
 		register_rest_route(
 			$namespace,
-			'/bookings/(?P<id>\d+)',
+			'/bookings/(?P<id>\\d+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_booking' ),
+					'permission_callback' => 'is_user_logged_in',
+				),
+			)
+		);
+
+		register_rest_route(
+			$namespace,
+			'/bookings/(?P<id>\\d+)/cancel',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'cancel_booking' ),
 					'permission_callback' => 'is_user_logged_in',
 				),
 			)
@@ -355,5 +367,109 @@ class Hotel_Booking_REST_API {
 		);
 
 		return $data;
+	}
+
+	/**
+	 * Cancel booking.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function cancel_booking( $request ) {
+		$booking_id = $request->get_param( 'id' );
+		$user_id = get_current_user_id();
+		$body = json_decode( $request->get_body(), true );
+		$reason = isset( $body['reason'] ) ? sanitize_text_field( $body['reason'] ) : '';
+
+		// Get booking
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'hb_bookings';
+		$booking = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM $table_name WHERE id = %d",
+				$booking_id
+			)
+		);
+
+		if ( ! $booking ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Booking not found',
+				),
+				404
+			);
+		}
+
+		// Check if booking belongs to user
+		// Note: For guest bookings, we might check email instead
+		if ( $booking->user_id && $booking->user_id != $user_id ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'You do not have permission to cancel this booking',
+				),
+				403
+			);
+		}
+
+		// Check if booking can be cancelled
+		if ( 'cancelled' === $booking->booking_status ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Booking is already cancelled',
+				),
+				400
+			);
+		}
+
+		if ( 'completed' === $booking->booking_status ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Cannot cancel a completed booking',
+				),
+				400
+			);
+		}
+
+		// Update booking status
+		$updated = $wpdb->update(
+			$table_name,
+			array(
+				'booking_status' => 'cancelled',
+				'notes'          => $reason ? $booking->notes . "\n\nCancellation reason: " . $reason : $booking->notes,
+			),
+			array( 'id' => $booking_id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+
+		if ( false === $updated ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Error cancelling booking',
+				),
+				500
+			);
+		}
+
+		// Release room availability
+		$availability = Hotel_Booking_Availability_Manager::get_instance();
+		$availability->release_dates( $booking_id );
+
+		// Send cancellation notification
+		$notification = Hotel_Booking_Notification_Manager::get_instance();
+		$notification->send_cancellation_email( $booking_id );
+
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => 'Booking cancelled successfully',
+			),
+			200
+		);
 	}
 }

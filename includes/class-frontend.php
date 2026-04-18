@@ -41,6 +41,10 @@ class Hotel_Booking_Frontend {
 		add_shortcode( 'hotel_booking', array( $this, 'render_shortcode' ) );
 		add_shortcode( 'hotel_booking_search', array( $this, 'render_search_form' ) );
 		add_shortcode( 'hotel_booking_rooms', array( $this, 'render_rooms_list' ) );
+		add_shortcode( 'hotel_booking_room_detail', array( $this, 'render_room_detail' ) );
+		add_shortcode( 'hotel_booking_my_bookings', array( $this, 'render_my_bookings' ) );
+		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
+		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 	}
 
 	/**
@@ -175,6 +179,171 @@ class Hotel_Booking_Frontend {
 			</div>
 		</div>
 		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Add rewrite rules for custom URLs.
+	 *
+	 * @return void
+	 */
+	public function add_rewrite_rules() {
+		add_rewrite_rule(
+			'^room/([^/]+)/?$',
+			'index.php?hb_room_id=$matches[1]',
+			'top'
+		);
+
+		add_rewrite_rule(
+			'^my-bookings/?$',
+			'index.php?hb_page=my-bookings',
+			'top'
+		);
+
+		add_rewrite_tag( '%hb_room_id%', '([^&]+)' );
+		add_rewrite_tag( '%hb_page%', '([^&]+)' );
+	}
+
+	/**
+	 * Template redirect handler.
+	 *
+	 * @return void
+	 */
+	public function template_redirect() {
+		$room_id = get_query_var( 'hb_room_id' );
+		$page = get_query_var( 'hb_page' );
+
+		if ( $room_id ) {
+			$this->render_room_detail_page( $room_id );
+			exit;
+		}
+
+		if ( 'my-bookings' === $page ) {
+			$this->render_my_bookings_page();
+			exit;
+		}
+	}
+
+	/**
+	 * Render room detail page.
+	 *
+	 * @param string $room_id Room ID or slug.
+	 * @return void
+	 */
+	private function render_room_detail_page( $room_id ) {
+		// Try to get room by slug first, then by ID
+		$room = get_page_by_path( $room_id, OBJECT, 'hb_room' );
+
+		if ( ! $room ) {
+			$room = get_post( absint( $room_id ) );
+		}
+
+		if ( ! $room || 'hb_room' !== $room->post_type ) {
+			wp_die( 'Room not found', 'Room Not Found', array( 'response' => 404 ) );
+		}
+
+		// Get query parameters
+		$check_in = isset( $_GET['check_in'] ) ? sanitize_text_field( $_GET['check_in'] ) : '';
+		$check_out = isset( $_GET['check_out'] ) ? sanitize_text_field( $_GET['check_out'] ) : '';
+		$guests = isset( $_GET['guests'] ) ? absint( $_GET['guests'] ) : 1;
+
+		// Set global data for template
+		global $hb_room_data;
+		$hb_room_data = array(
+			'id'        => $room->ID,
+			'check_in'  => $check_in,
+			'check_out' => $check_out,
+			'guests'    => $guests,
+		);
+
+		// Load template
+		$template_path = HOTEL_BOOKING_PLUGIN_DIR . 'templates/room-detail.php';
+
+		if ( file_exists( $template_path ) ) {
+			include $template_path;
+		} else {
+			wp_die( 'Template not found', 'Template Not Found', array( 'response' => 500 ) );
+		}
+	}
+
+	/**
+	 * Render my bookings page.
+	 *
+	 * @return void
+	 */
+	private function render_my_bookings_page() {
+		$template_path = HOTEL_BOOKING_PLUGIN_DIR . 'templates/my-bookings.php';
+
+		if ( file_exists( $template_path ) ) {
+			include $template_path;
+		} else {
+			wp_die( 'Template not found', 'Template Not Found', array( 'response' => 500 ) );
+		}
+	}
+
+	/**
+	 * Render room detail shortcode.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_room_detail( $atts ) {
+		$atts = shortcode_atts(
+			array(
+				'room_id'   => 0,
+				'check_in'  => '',
+				'check_out' => '',
+				'guests'    => 1,
+			),
+			$atts
+		);
+
+		$room_id = absint( $atts['room_id'] );
+
+		if ( ! $room_id ) {
+			return '<div class="hb-message error">Room ID is required.</div>';
+		}
+
+		$room = get_post( $room_id );
+
+		if ( ! $room || 'hb_room' !== $room->post_type ) {
+			return '<div class="hb-message error">Room not found.</div>';
+		}
+
+		// Set global data for template
+		global $hb_room_data;
+		$hb_room_data = array(
+			'id'        => $room_id,
+			'check_in'  => $atts['check_in'],
+			'check_out' => $atts['check_out'],
+			'guests'    => absint( $atts['guests'] ),
+		);
+
+		ob_start();
+		include HOTEL_BOOKING_PLUGIN_DIR . 'templates/room-detail.php';
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render my bookings shortcode.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_my_bookings( $atts ) {
+		if ( ! is_user_logged_in() ) {
+			ob_start();
+			?>
+			<div class="hb-message error">
+				<p>You must be logged in to view your bookings.</p>
+				<a href="<?php echo esc_url( wp_login_url() ); ?>" class="button">Login</a>
+			</div>
+			<?php
+			return ob_get_clean();
+		}
+
+		ob_start();
+		include HOTEL_BOOKING_PLUGIN_DIR . 'templates/my-bookings.php';
 		return ob_get_clean();
 	}
 }

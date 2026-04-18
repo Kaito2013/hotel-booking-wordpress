@@ -200,4 +200,62 @@ class Hotel_Booking_Notification_Manager {
 
 		return $message;
 	}
+
+	/**
+	 * Send cancellation email.
+	 *
+	 * @param int $booking_id Booking ID.
+	 * @return void
+	 */
+	public function send_cancellation_email( $booking_id ) {
+		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
+
+		if ( ! $booking ) {
+			return;
+		}
+
+		$to      = $booking->email;
+		$subject = sprintf( __( 'Booking Cancelled - #%s', 'hotel-booking' ), $booking_id );
+		$message = $this->get_cancellation_email_template( $booking_id, $booking );
+
+		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+		wp_mail( $to, $subject, $message, $headers );
+	}
+
+	/**
+	 * Get cancellation email template.
+	 *
+	 * @param int    $booking_id Booking ID.
+	 * @param object $booking    Booking object.
+	 * @return string
+	 */
+	private function get_cancellation_email_template( $booking_id, $booking ) {
+		$message = '<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
+		$message .= '<h2 style="color: #d63638;">' . __( 'Booking Cancelled', 'hotel-booking' ) . '</h2>';
+		$message .= '<p>' . sprintf( __( 'Your booking #%s has been cancelled.', 'hotel-booking' ), $booking_id ) . '</p>';
+
+		$room = get_post( $booking->room_id );
+		if ( $room ) {
+			$message .= '<h3>' . __( 'Room Details', 'hotel-booking' ) . '</h3>';
+			$message .= '<p><strong>' . __( 'Room:', 'hotel-booking' ) . '</strong> ' . esc_html( $room->post_title ) . '</p>';
+		}
+
+		$message .= '<p><strong>' . __( 'Check-in:', 'hotel-booking' ) . '</strong> ' . esc_html( $booking->check_in ) . '</p>';
+		$message .= '<p><strong>' . __( 'Check-out:', 'hotel-booking' ) . '</strong> ' . esc_html( $booking->check_out ) . '</p>';
+		$message .= '<p><strong>' . __( 'Guests:', 'hotel-booking' ) . '</strong> ' . esc_html( $booking->guests ) . '</p>';
+		$message .= '<p><strong>' . __( 'Total:', 'hotel-booking' ) . '</strong> ' . get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ) . '</p>';
+
+		if ( 'pending' === $booking->payment_status ) {
+			$message .= '<p style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 4px;">';
+			$message .= '<strong>' . __( 'Note:', 'hotel-booking' ) . '</strong> ';
+			$message .= __( 'Your payment was not processed, so no refund is needed.', 'hotel-booking' );
+			$message .= '</p>';
+		}
+
+		$message .= '<p>' . __( 'We hope to see you again soon!', 'hotel-booking' ) . '</p>';
+		$message .= '</body></html>';
+
+		return $message;
+	}
 }
