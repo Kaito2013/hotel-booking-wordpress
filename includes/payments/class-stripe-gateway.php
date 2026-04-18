@@ -276,9 +276,12 @@ class Hotel_Booking_Stripe_Gateway extends Hotel_Booking_Payment_Gateway {
 			$booking_manager->update_payment_status( $booking_id, 'completed', $payment_id );
 			$booking_manager->update_status( $booking_id, 'confirmed' );
 
-			// Send confirmation email
+			// Send notifications
 			$notification = Hotel_Booking_Notification_Manager::get_instance();
 			$notification->send_confirmation_email( $booking_id );
+			$notification->send_payment_email( $booking_id, 'completed', $payment_id, 'Stripe' );
+			$notification->send_admin_new_booking_notification( $booking_id );
+			$notification->send_admin_payment_notification( $booking_id, $payment_id, 'Stripe' );
 
 			wp_send_json_success( array(
 				'message' => __( 'Payment successful', 'hotel-booking' ),
@@ -372,9 +375,12 @@ class Hotel_Booking_Stripe_Gateway extends Hotel_Booking_Payment_Gateway {
 		$booking_manager->update_payment_status( $booking_id, 'completed', $payment_intent->id );
 		$booking_manager->update_status( $booking_id, 'confirmed' );
 
-		// Send confirmation email
+		// Send notifications
 		$notification = Hotel_Booking_Notification_Manager::get_instance();
 		$notification->send_confirmation_email( $booking_id );
+		$notification->send_payment_email( $booking_id, 'completed', $payment_intent->id, 'Stripe' );
+		$notification->send_admin_new_booking_notification( $booking_id );
+		$notification->send_admin_payment_notification( $booking_id, $payment_intent->id, 'Stripe' );
 	}
 
 	/**

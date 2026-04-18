@@ -49,45 +49,90 @@ class Hotel_Booking_Notification_Manager {
 	 * @param array $data       Booking data.
 	 * @return void
 	 */
-	public function send_confirmation_email( $booking_id, $data ) {
+	public function send_confirmation_email( $booking_id, $data = array() ) {
 		if ( '1' !== get_option( 'hb_confirmation_email', '1' ) ) {
 			return;
 		}
 
-		$to      = $data['email'];
-		$subject = sprintf( __( 'Booking Confirmation - %s', 'hotel-booking' ), get_bloginfo( 'name' ) );
-		$message = $this->get_confirmation_email_template( $booking_id, $data );
+		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
 
-		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+		if ( ! $booking ) {
+			return;
+		}
 
-		wp_mail( $to, $subject, $message, $headers );
+		$room = get_post( $booking->room_id );
+
+		$variables = array(
+			'booking_number'   => $booking_id,
+			'guest_name'       => $booking->guest_name,
+			'guest_email'      => $booking->email,
+			'room_name'        => $room ? $room->post_title : '',
+			'check_in'         => $booking->check_in,
+			'check_out'        => $booking->check_out,
+			'guests'           => $booking->guests,
+			'total_amount'     => get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ),
+			'check_in_time'    => get_option( 'hb_default_check_in', '14:00' ),
+			'check_out_time'   => get_option( 'hb_default_check_out', '11:00' ),
+			'special_requests' => $booking->special_requests ?? '',
+			'hotel_name'       => get_bloginfo( 'name' ),
+		);
+
+		$rendered = Hotel_Booking_Email_Template_Manager::get_instance()->render_template( 'booking_confirmation', $variables );
+
+		if ( $rendered ) {
+			$to      = $booking->email;
+			$subject = $rendered['subject'];
+			$message = $rendered['body'];
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+			wp_mail( $to, $subject, $message, $headers );
+		}
 	}
 
 	/**
-	 * Get confirmation email template.
+	 * Send admin notification for new booking.
 	 *
-	 * @param int   $booking_id Booking ID.
-	 * @param array $data       Booking data.
-	 * @return string
+	 * @param int $booking_id Booking ID.
+	 * @return void
 	 */
-	private function get_confirmation_email_template( $booking_id, $data ) {
-		$room = get_post( $data['room_id'] );
+	public function send_admin_new_booking_notification( $booking_id ) {
+		if ( '1' !== get_option( 'hb_admin_notifications', '1' ) ) {
+			return;
+		}
 
-		$message = '<html><body style="font-family: Arial, sans-serif;">';
-		$message .= '<h2>' . __( 'Booking Confirmation', 'hotel-booking' ) . '</h2>';
-		$message .= '<p>' . __( 'Thank you for your booking! Here are your details:', 'hotel-booking' ) . '</p>';
-		$message .= '<table style="border-collapse: collapse; width: 100%;">';
-		$message .= '<tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>' . __( 'Booking ID:', 'hotel-booking' ) . '</strong></td><td style="padding: 10px; border: 1px solid #ddd;">#' . $booking_id . '</td></tr>';
-		$message .= '<tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>' . __( 'Room:', 'hotel-booking' ) . '</strong></td><td style="padding: 10px; border: 1px solid #ddd;">' . ( $room ? $room->post_title : '' ) . '</td></tr>';
-		$message .= '<tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>' . __( 'Check-in:', 'hotel-booking' ) . '</strong></td><td style="padding: 10px; border: 1px solid #ddd;">' . $data['check_in'] . '</td></tr>';
-		$message .= '<tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>' . __( 'Check-out:', 'hotel-booking' ) . '</strong></td><td style="padding: 10px; border: 1px solid #ddd;">' . $data['check_out'] . '</td></tr>';
-		$message .= '<tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>' . __( 'Guests:', 'hotel-booking' ) . '</strong></td><td style="padding: 10px; border: 1px solid #ddd;">' . $data['guests'] . '</td></tr>';
-		$message .= '<tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>' . __( 'Total Price:', 'hotel-booking' ) . '</strong></td><td style="padding: 10px; border: 1px solid #ddd;">' . get_option( 'hb_currency_symbol', '$' ) . number_format( $data['total_price'], 2 ) . '</td></tr>';
-		$message .= '</table>';
-		$message .= '<p style="margin-top: 20px;">' . __( 'We look forward to seeing you!', 'hotel-booking' ) . '</p>';
-		$message .= '</body></html>';
+		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
 
-		return $message;
+		if ( ! $booking ) {
+			return;
+		}
+
+		$room = get_post( $booking->room_id );
+
+		$variables = array(
+			'booking_number'    => $booking_id,
+			'guest_name'        => $booking->guest_name,
+			'guest_email'       => $booking->email,
+			'guest_phone'       => $booking->phone ?? '',
+			'room_name'         => $room ? $room->post_title : '',
+			'check_in'          => $booking->check_in,
+			'check_out'         => $booking->check_out,
+			'guests'            => $booking->guests,
+			'total_amount'      => get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ),
+			'special_requests'  => $booking->special_requests ?? '',
+			'admin_booking_url' => admin_url( 'admin.php?page=hotel-booking-bookings' ),
+			'hotel_name'        => get_bloginfo( 'name' ),
+		);
+
+		$rendered = Hotel_Booking_Email_Template_Manager::get_instance()->render_template( 'admin_new_booking', $variables );
+
+		if ( $rendered ) {
+			$to      = get_option( 'admin_email' );
+			$subject = $rendered['subject'];
+			$message = $rendered['body'];
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+			wp_mail( $to, $subject, $message, $headers );
+		}
 	}
 
 	/**
@@ -104,40 +149,35 @@ class Hotel_Booking_Notification_Manager {
 			return;
 		}
 
-		$to      = $booking->email;
-		$subject = sprintf( __( 'Booking Status Update - #%s', 'hotel-booking' ), $booking_id );
-		$message = $this->get_status_update_email_template( $booking_id, $status, $booking );
+		$room = get_post( $booking->room_id );
 
-		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+		if ( 'cancelled' === $status ) {
+			$template_key = 'booking_cancelled';
+		} else {
+			return; // Only send email for cancellations
+		}
 
-		wp_mail( $to, $subject, $message, $headers );
-	}
-
-	/**
-	 * Get status update email template.
-	 *
-	 * @param int    $booking_id Booking ID.
-	 * @param string $status     Status.
-	 * @param object $booking    Booking object.
-	 * @return string
-	 */
-	private function get_status_update_email_template( $booking_id, $status, $booking ) {
-		$status_labels = array(
-			'pending'   => __( 'Pending', 'hotel-booking' ),
-			'confirmed' => __( 'Confirmed', 'hotel-booking' ),
-			'cancelled' => __( 'Cancelled', 'hotel-booking' ),
-			'completed' => __( 'Completed', 'hotel-booking' ),
+		$variables = array(
+			'booking_number' => $booking_id,
+			'guest_name'     => $booking->guest_name,
+			'guest_email'    => $booking->email,
+			'room_name'      => $room ? $room->post_title : '',
+			'check_in'       => $booking->check_in,
+			'check_out'      => $booking->check_out,
+			'total_amount'   => get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ),
+			'hotel_name'     => get_bloginfo( 'name' ),
 		);
 
-		$status_label = isset( $status_labels[ $status ] ) ? $status_labels[ $status ] : $status;
+		$rendered = Hotel_Booking_Email_Template_Manager::get_instance()->render_template( $template_key, $variables );
 
-		$message = '<html><body style="font-family: Arial, sans-serif;">';
-		$message .= '<h2>' . __( 'Booking Status Update', 'hotel-booking' ) . '</h2>';
-		$message .= '<p>' . sprintf( __( 'Your booking #%s status has been updated to:', 'hotel-booking' ), $booking_id ) . '</p>';
-		$message .= '<p style="font-size: 18px; font-weight: bold; color: ' . ( 'confirmed' === $status ? 'green' : ( 'cancelled' === $status ? 'red' : 'orange' ) . ';">' . $status_label . '</p>';
-		$message .= '</body></html>';
+		if ( $rendered ) {
+			$to      = $booking->email;
+			$subject = $rendered['subject'];
+			$message = $rendered['body'];
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
-		return $message;
+			wp_mail( $to, $subject, $message, $headers );
+		}
 	}
 
 	/**
@@ -145,64 +185,84 @@ class Hotel_Booking_Notification_Manager {
 	 *
 	 * @param int    $booking_id Booking ID.
 	 * @param string $status     Payment status.
+	 * @param string $transaction_id Transaction ID (optional).
+	 * @param string $payment_method Payment method (optional).
 	 * @return void
 	 */
-	public function send_payment_email( $booking_id, $status ) {
+	public function send_payment_email( $booking_id, $status, $transaction_id = '', $payment_method = '' ) {
 		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
 
 		if ( ! $booking ) {
 			return;
 		}
 
-		$to      = $booking->email;
-		$subject = sprintf( __( 'Payment Status Update - #%s', 'hotel-booking' ), $booking_id );
+		$template_key = 'completed' === $status ? 'payment_confirmation' : 'payment_failed';
 
-		if ( 'completed' === $status ) {
-			$message = $this->get_payment_success_email_template( $booking_id, $booking );
-		} else {
-			$message = $this->get_payment_failed_email_template( $booking_id, $booking );
+		$variables = array(
+			'booking_number'  => $booking_id,
+			'guest_name'      => $booking->guest_name,
+			'guest_email'     => $booking->email,
+			'total_amount'    => get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ),
+			'payment_method'  => $payment_method,
+			'transaction_id'  => $transaction_id,
+			'hotel_name'      => get_bloginfo( 'name' ),
+			'booking_url'     => home_url( '/booking-confirmation?booking_id=' . $booking_id ),
+		);
+
+		$rendered = Hotel_Booking_Email_Template_Manager::get_instance()->render_template( $template_key, $variables );
+
+		if ( $rendered ) {
+			$to      = $booking->email;
+			$subject = $rendered['subject'];
+			$message = $rendered['body'];
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+			wp_mail( $to, $subject, $message, $headers );
+		}
+	}
+
+	/**
+	 * Send admin payment notification.
+	 *
+	 * @param int    $booking_id Booking ID.
+	 * @param string $transaction_id Transaction ID.
+	 * @param string $payment_method Payment method.
+	 * @return void
+	 */
+	public function send_admin_payment_notification( $booking_id, $transaction_id = '', $payment_method = '' ) {
+		if ( '1' !== get_option( 'hb_admin_notifications', '1' ) ) {
+			return;
 		}
 
-		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
 
-		wp_mail( $to, $subject, $message, $headers );
+		if ( ! $booking ) {
+			return;
+		}
+
+		$variables = array(
+			'booking_number'    => $booking_id,
+			'guest_name'        => $booking->guest_name,
+			'guest_email'       => $booking->email,
+			'total_amount'      => get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ),
+			'payment_method'    => $payment_method,
+			'transaction_id'    => $transaction_id,
+			'admin_booking_url' => admin_url( 'admin.php?page=hotel-booking-bookings' ),
+			'hotel_name'        => get_bloginfo( 'name' ),
+		);
+
+		$rendered = Hotel_Booking_Email_Template_Manager::get_instance()->render_template( 'admin_payment_received', $variables );
+
+		if ( $rendered ) {
+			$to      = get_option( 'admin_email' );
+			$subject = $rendered['subject'];
+			$message = $rendered['body'];
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+			wp_mail( $to, $subject, $message, $headers );
+		}
 	}
-
-	/**
-	 * Get payment success email template.
-	 *
-	 * @param int    $booking_id Booking ID.
-	 * @param object $booking    Booking object.
-	 * @return string
-	 */
-	private function get_payment_success_email_template( $booking_id, $booking ) {
-		$message = '<html><body style="font-family: Arial, sans-serif;">';
-		$message .= '<h2>' . __( 'Payment Successful!', 'hotel-booking' ) . '</h2>';
-		$message .= '<p>' . sprintf( __( 'Payment for booking #%s has been completed successfully.', 'hotel-booking' ), $booking_id ) . '</p>';
-		$message .= '<p>' . __( 'Amount paid:', 'hotel-booking' ) . ' ' . get_option( 'hb_currency_symbol', '$' ) . number_format( $booking->total_price, 2 ) . '</p>';
-		$message .= '</body></html>';
-
-		return $message;
-	}
-
-	/**
-	 * Get payment failed email template.
-	 *
-	 * @param int    $booking_id Booking ID.
-	 * @param object $booking    Booking object.
-	 * @return string
-	 */
-	private function get_payment_failed_email_template( $booking_id, $booking ) {
-		$message = '<html><body style="font-family: Arial, sans-serif;">';
-		$message .= '<h2>' . __( 'Payment Failed', 'hotel-booking' ) . '</h2>';
-		$message .= '<p>' . sprintf( __( 'Payment for booking #%s has failed. Please try again.', 'hotel-booking' ), $booking_id ) . '</p>';
-		$message .= '</body></html>';
-
-		return $message;
-	}
-
-	/**
-	 * Send cancellation email.
+}
 	 *
 	 * @param int $booking_id Booking ID.
 	 * @return void

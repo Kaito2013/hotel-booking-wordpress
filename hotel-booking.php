@@ -87,6 +87,9 @@ final class Hotel_Booking {
 		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/payments/class-stripe-gateway.php';
 		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/payments/class-paypal-gateway.php';
 
+		// Email templates
+		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-email-template-manager.php';
+
 		// Notifications
 		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-notification-manager.php';
 
@@ -261,6 +264,7 @@ final class Hotel_Booking {
 		}
 
 		Hotel_Booking_Payment_Gateway::get_instance();
+		Hotel_Booking_Email_Template_Manager::get_instance();
 		Hotel_Booking_Notification_Manager::get_instance();
 		Hotel_Booking_REST_API::get_instance();
 		Hotel_Booking_Frontend::get_instance();

@@ -83,6 +83,15 @@ class Hotel_Booking_Admin {
 			'hotel-booking-settings',
 			array( $this, 'render_settings' )
 		);
+
+		add_submenu_page(
+			'hotel-booking',
+			__( 'Email Templates', 'hotel-booking' ),
+			__( 'Email Templates', 'hotel-booking' ),
+			'manage_options',
+			'hotel-booking-email-templates',
+			array( $this, 'render_email_templates' )
+		);
 	}
 
 	/**
@@ -147,5 +156,14 @@ class Hotel_Booking_Admin {
 	 */
 	public function render_settings() {
 		include HOTEL_BOOKING_PLUGIN_DIR . 'admin/views/settings.php';
+	}
+
+	/**
+	 * Render email templates.
+	 *
+	 * @return void
+	 */
+	public function render_email_templates() {
+		include HOTEL_BOOKING_PLUGIN_DIR . 'admin/views/email-templates.php';
 	}
 }
