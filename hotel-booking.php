@@ -79,6 +79,7 @@ final class Hotel_Booking {
 			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-admin-settings.php';
 			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-admin-dashboard.php';
 			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-admin-calendar.php';
+			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-room-metaboxes.php';
 		}
 
 		// Payment gateways
@@ -91,6 +92,9 @@ final class Hotel_Booking {
 
 		// REST API
 		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-rest-api.php';
+
+		// Frontend
+		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-frontend.php';
 	}
 
 	/**
@@ -259,6 +263,7 @@ final class Hotel_Booking {
 		Hotel_Booking_Payment_Gateway::get_instance();
 		Hotel_Booking_Notification_Manager::get_instance();
 		Hotel_Booking_REST_API::get_instance();
+		Hotel_Booking_Frontend::get_instance();
 	}
 
 	/**

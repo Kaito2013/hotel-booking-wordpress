@@ -1,0 +1,297 @@
+/**
+ * Hotel Booking Admin Styles
+ */
+
+/* Dashboard Stats */
+.hb-dashboard-stats {
+	display: flex;
+	gap: 20px;
+	margin: 30px 0;
+	flex-wrap: wrap;
+}
+
+.hb-stat-card {
+	flex: 1;
+	min-width: 200px;
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.hb-stat-icon {
+	font-size: 2.5em;
+}
+
+.hb-stat-content h3 {
+	margin: 0;
+	font-size: 2em;
+	color: #2271b1;
+}
+
+.hb-stat-content p {
+	margin: 5px 0 0;
+	color: #646970;
+	font-size: 0.9em;
+}
+
+/* Quick Actions */
+.hb-quick-actions {
+	margin: 30px 0;
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 4px;
+}
+
+.hb-quick-actions .button {
+	margin-right: 10px;
+}
+
+/* Recent Bookings Table */
+.hb-recent-bookings {
+	margin: 30px 0;
+}
+
+.hb-recent-bookings h2 {
+	margin-bottom: 20px;
+}
+
+.hb-status {
+	display: inline-block;
+	padding: 4px 12px;
+	border-radius: 3px;
+	font-size: 0.85em;
+	font-weight: 600;
+}
+
+.hb-status-pending {
+	background: #f0f0f1;
+	color: #646970;
+}
+
+.hb-status-confirmed {
+	background: #edfaef;
+	color: #00a32a;
+}
+
+.hb-status-cancelled {
+	background: #fef2f2;
+	color: #d63638;
+}
+
+.hb-status-completed {
+	background: #e5f7ff;
+	color: #2271b1;
+}
+
+/* Calendar Styles */
+.hb-calendar-controls {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	margin: 20px 0;
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 4px;
+}
+
+.hb-calendar-controls label {
+	font-weight: 600;
+}
+
+.hb-calendar-controls select,
+.hb-calendar-controls button {
+	margin: 0;
+}
+
+#hb-calendar-container {
+	margin: 30px 0;
+	min-height: 400px;
+}
+
+.hb-calendar-loading {
+	text-align: center;
+	padding: 100px 0;
+	color: #646970;
+}
+
+.hb-calendar-loading .spinner {
+	float: none;
+	margin: 0 auto 15px;
+}
+
+/* Calendar Grid */
+.hb-calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px;
+	background: #ccd0d4;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.hb-calendar-header {
+	background: #f6f7f7;
+	padding: 15px 10px;
+	text-align: center;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.hb-calendar-day {
+	background: #fff;
+	min-height: 100px;
+	padding: 10px;
+	position: relative;
+}
+
+.hb-calendar-day.today {
+	background: #f0f6fc;
+}
+
+.hb-calendar-day-number {
+	font-weight: 600;
+	margin-bottom: 5px;
+	display: block;
+}
+
+.hb-calendar-day.available {
+	background: #edfaef;
+}
+
+.hb-calendar-day.booked {
+	background: #fef2f2;
+}
+
+.hb-calendar-day .booking-count {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	background: #2271b1;
+	color: #fff;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.75em;
+}
+
+/* Calendar Legend */
+.hb-calendar-legend {
+	margin: 30px 0;
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 4px;
+}
+
+.hb-calendar-legend h3 {
+	margin-top: 0;
+	margin-bottom: 15px;
+}
+
+.hb-legend-item {
+	display: inline-flex;
+	align-items: center;
+	margin-right: 30px;
+}
+
+.hb-legend-color {
+	width: 20px;
+	height: 20px;
+	border-radius: 3px;
+	margin-right: 8px;
+	display: inline-block;
+}
+
+.hb-legend-color.hb-available {
+	background: #edfaef;
+}
+
+.hb-legend-color.hb-booked {
+	background: #fef2f2;
+}
+
+/* Settings Panels */
+.hb-settings-panel {
+	margin-top: 20px;
+	padding: 20px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+}
+
+.hb-settings-panel .form-table {
+	margin-top: 0;
+}
+
+/* Pricing Rules */
+#hb-pricing-rules-container {
+	margin: 20px 0;
+}
+
+.hb-pricing-rule {
+	background: #f6f7f7;
+	padding: 15px;
+	margin-bottom: 15px;
+	border-radius: 4px;
+	border-left: 4px solid #2271b1;
+}
+
+.hb-pricing-rule .form-table {
+	margin: 0;
+}
+
+.hb-pricing-rule .form-table th {
+	padding-left: 0;
+}
+
+.hb-pricing-rule .form-table td {
+	padding-right: 0;
+}
+
+#hb-add-pricing-rule {
+	margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+	.hb-dashboard-stats {
+		flex-direction: column;
+	}
+
+	.hb-stat-card {
+		min-width: 100%;
+	}
+
+	.hb-calendar-grid {
+		font-size: 0.9em;
+	}
+
+	.hb-calendar-day {
+		min-height: 60px;
+	}
+}
+
+/* General Wrap Styles */
+.hotel-booking-wrap {
+	max-width: 1200px;
+}
+
+.hotel-booking-wrap h1 {
+	margin-bottom: 20px;
+}
+
+/* Form Styles */
+.hotel-booking-wrap .regular-text,
+.hotel-booking-wrap .small-text,
+.hotel-booking-wrap .medium-text {
+	margin-right: 10px;
+}
+
+.hotel-booking-wrap .description {
+	font-style: italic;
+	color: #646970;
+}
