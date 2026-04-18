@@ -24,12 +24,24 @@ Complete hotel booking system for WordPress with room management, availability c
 - Taxonomy management for room types and amenities
 
 ### Frontend Features
-- Room search with filters
-- Availability checking
-- Price calculation
-- Online booking form
-- Payment processing
-- Booking confirmation
+- Room search with date and guest filters
+- Room list with availability and pricing
+- Room detail page with gallery and amenities
+- Real-time price calculation
+- Online booking form with validation
+- Payment processing (Stripe & PayPal)
+- **Booking confirmation page** with full details
+- **My Bookings page** for booking history
+- **Booking cancellation** with email notification
+- Mini calendar for availability
+- Responsive mobile-friendly design
+
+### User Features
+- View booking history
+- Cancel pending bookings
+- Download booking receipts (coming soon)
+- Contact support information
+- Email confirmations and reminders
 
 ## Requirements
 
