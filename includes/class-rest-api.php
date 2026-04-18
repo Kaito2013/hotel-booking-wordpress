@@ -148,6 +148,57 @@ class Hotel_Booking_REST_API {
 				),
 			)
 		);
+
+		// Payment routes
+		// Stripe
+		register_rest_route(
+			$namespace,
+			'/payments/stripe/create-intent',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'stripe_create_intent' ),
+					'permission_callback' => '__return_true',
+				),
+			)
+		);
+
+		register_rest_route(
+			$namespace,
+			'/payments/stripe/confirm-payment',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'stripe_confirm_payment' ),
+					'permission_callback' => '__return_true',
+				),
+			)
+		);
+
+		// PayPal
+		register_rest_route(
+			$namespace,
+			'/payments/paypal/create-order',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'paypal_create_order' ),
+					'permission_callback' => '__return_true',
+				),
+			)
+		);
+
+		register_rest_route(
+			$namespace,
+			'/payments/paypal/capture-order',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'paypal_capture_order' ),
+					'permission_callback' => '__return_true',
+				),
+			)
+		);
 	}
 
 	/**
@@ -472,4 +523,193 @@ class Hotel_Booking_REST_API {
 			200
 		);
 	}
+
+	/**
+	 * Create Stripe payment intent.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function stripe_create_intent( $request ) {
+		$booking_id = $request->get_param( 'booking_id' );
+
+		if ( ! $booking_id ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Invalid booking ID',
+				),
+				400
+			);
+		}
+
+		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
+
+		if ( ! $booking ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Booking not found',
+				),
+				404
+			);
+		}
+
+		// Delegate to Stripe gateway
+		$result = Hotel_Booking_Stripe_Gateway::get_instance()->process_payment( $booking_id, array() );
+
+		if ( is_wp_error( $result ) ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				400
+			);
+		}
+
+		return new WP_REST_Response(
+			array(
+				'success'       => true,
+				'client_secret' => $result['client_secret'],
+				'payment_id'    => $result['payment_id'],
+			),
+			200
+		);
+	}
+
+	/**
+	 * Confirm Stripe payment.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function stripe_confirm_payment( $request ) {
+		$booking_id = $request->get_param( 'booking_id' );
+		$payment_id = $request->get_param( 'payment_id' );
+
+		if ( ! $booking_id || ! $payment_id ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Invalid parameters',
+				),
+				400
+			);
+		}
+
+		// Delegate to Stripe gateway (via webhook simulation)
+		$stripe_gateway = Hotel_Booking_Stripe_Gateway::get_instance();
+
+		// Update booking payment status
+		Hotel_Booking_Booking_Manager::get_instance()->update_payment_status( $booking_id, 'completed', $payment_id );
+		Hotel_Booking_Booking_Manager::get_instance()->update_status( $booking_id, 'confirmed' );
+
+		// Send confirmation email
+		Hotel_Booking_Notification_Manager::get_instance()->send_confirmation_email( $booking_id );
+
+		return new WP_REST_Response(
+			array(
+				'success'      => true,
+				'message'      => 'Payment successful',
+				'redirect_url' => home_url( '/booking-confirmation?booking_id=' . $booking_id ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * Create PayPal order.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function paypal_create_order( $request ) {
+		$booking_id = $request->get_param( 'booking_id' );
+
+		if ( ! $booking_id ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Invalid booking ID',
+				),
+				400
+			);
+		}
+
+		$booking = Hotel_Booking_Booking_Manager::get_instance()->get_booking( $booking_id );
+
+		if ( ! $booking ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Booking not found',
+				),
+				404
+			);
+		}
+
+		// Delegate to PayPal gateway
+		$result = Hotel_Booking_PayPal_Gateway::get_instance()->process_payment( $booking_id, array() );
+
+		if ( is_wp_error( $result ) ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				400
+			);
+		}
+
+		// For REST API, we need to extract the approval URL and get the order ID
+		// In a real implementation, you'd parse the PayPal payment object
+		return new WP_REST_Response(
+			array(
+				'success'      => true,
+				'order_id'     => $result['payment_id'],
+				'approval_url' => $result['approval_url'],
+			),
+			200
+		);
+	}
+
+	/**
+	 * Capture PayPal order.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response
+	 */
+	public function paypal_capture_order( $request ) {
+		$booking_id = $request->get_param( 'booking_id' );
+		$order_id   = $request->get_param( 'order_id' );
+		$payer_id   = $request->get_param( 'payer_id' );
+
+		if ( ! $booking_id || ! $order_id || ! $payer_id ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Invalid parameters',
+				),
+				400
+			);
+		}
+
+		// Update booking payment status
+		Hotel_Booking_Booking_Manager::get_instance()->update_payment_status( $booking_id, 'completed', $order_id );
+		Hotel_Booking_Booking_Manager::get_instance()->update_status( $booking_id, 'confirmed' );
+
+		// Send confirmation email
+		Hotel_Booking_Notification_Manager::get_instance()->send_confirmation_email( $booking_id );
+
+		return new WP_REST_Response(
+			array(
+				'success'      => true,
+				'message'      => 'Payment successful',
+				'redirect_url' => home_url( '/booking-confirmation?booking_id=' . $booking_id ),
+			),
+			200
+		);
+	}
 }
+

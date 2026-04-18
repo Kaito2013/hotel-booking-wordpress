@@ -69,6 +69,63 @@ class Hotel_Booking_Frontend {
 			true
 		);
 
+		// Payment CSS (only on pages that need it)
+		if ( is_page() && ( get_query_var( 'hb_page' ) || get_query_var( 'hb_room_id' ) ) ) {
+			wp_enqueue_style(
+				'hotel-booking-payment',
+				HOTEL_BOOKING_PLUGIN_URL . 'assets/css/payment.css',
+				array(),
+				HOTEL_BOOKING_VERSION
+			);
+		}
+
+		// Payment JS (only on pages that need it)
+		if ( is_page() && ( get_query_var( 'hb_page' ) || get_query_var( 'hb_room_id' ) ) ) {
+			wp_enqueue_script(
+				'hotel-booking-payment',
+				HOTEL_BOOKING_PLUGIN_URL . 'assets/js/payment.js',
+				array( 'jquery' ),
+				HOTEL_BOOKING_VERSION,
+				true
+			);
+		}
+
+		// Stripe SDK (if enabled)
+		if ( '1' === get_option( 'hb_stripe_enabled', '0' ) ) {
+			$stripe_key = '1' === get_option( 'hb_stripe_test_mode', '0' )
+				? get_option( 'hb_stripe_test_public', '' )
+				: get_option( 'hb_stripe_live_public', '' );
+
+			if ( $stripe_key ) {
+				wp_enqueue_script(
+					'stripe-js',
+					'https://js.stripe.com/v3/',
+					array(),
+					null,
+					true
+				);
+				wp_script_add_data( 'stripe-js', 'async', true );
+			}
+		}
+
+		// PayPal SDK (if enabled)
+		if ( '1' === get_option( 'hb_paypal_enabled', '0' ) ) {
+			$paypal_client_id = '1' === get_option( 'hb_paypal_test_mode', '0' )
+				? get_option( 'hb_paypal_sandbox_client_id', '' )
+				: get_option( 'hb_paypal_client_id', '' );
+
+			if ( $paypal_client_id ) {
+				wp_enqueue_script(
+					'paypal-js',
+					'https://www.paypal.com/sdk/js?client-id=' . $paypal_client_id . '&currency=' . get_option( 'hb_currency', 'USD' ),
+					array(),
+					null,
+					true
+				);
+				wp_script_add_data( 'paypal-js', 'async', true );
+			}
+		}
+
 		wp_localize_script(
 			'hotel-booking-frontend',
 			'hotelBookingSettings',

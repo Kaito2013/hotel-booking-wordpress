@@ -264,6 +264,20 @@ final class Hotel_Booking {
 		Hotel_Booking_Notification_Manager::get_instance();
 		Hotel_Booking_REST_API::get_instance();
 		Hotel_Booking_Frontend::get_instance();
+
+		// Initialize payment gateways
+		Hotel_Booking_Stripe_Gateway::get_instance();
+		Hotel_Booking_PayPal_Gateway::get_instance();
+
+		// Register PayPal return handlers
+		add_action( 'wp_ajax_hb_paypal_success', array( Hotel_Booking_PayPal_Gateway::get_instance(), 'handle_paypal_success' ) );
+		add_action( 'wp_ajax_nopriv_hb_paypal_success', array( Hotel_Booking_PayPal_Gateway::get_instance(), 'handle_paypal_success' ) );
+		add_action( 'wp_ajax_hb_paypal_cancel', array( Hotel_Booking_PayPal_Gateway::get_instance(), 'handle_paypal_cancel' ) );
+		add_action( 'wp_ajax_nopriv_hb_paypal_cancel', array( Hotel_Booking_PayPal_Gateway::get_instance(), 'handle_paypal_cancel' ) );
+
+		// Register Stripe webhook handler
+		add_action( 'init', array( Hotel_Booking_Stripe_Gateway::get_instance(), 'register_webhook_endpoint' ), 0 );
+		add_action( 'template_redirect', array( Hotel_Booking_Stripe_Gateway::get_instance(), 'handle_webhook_request' ) );
 	}
 
 	/**

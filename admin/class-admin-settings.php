@@ -62,11 +62,14 @@ class Hotel_Booking_Admin_Settings {
 		register_setting( 'hb_payment_settings', 'hb_stripe_test_secret' );
 		register_setting( 'hb_payment_settings', 'hb_stripe_live_public' );
 		register_setting( 'hb_payment_settings', 'hb_stripe_live_secret' );
+		register_setting( 'hb_payment_settings', 'hb_stripe_webhook_secret' );
 
 		register_setting( 'hb_payment_settings', 'hb_paypal_enabled' );
 		register_setting( 'hb_payment_settings', 'hb_paypal_test_mode' );
 		register_setting( 'hb_payment_settings', 'hb_paypal_client_id' );
 		register_setting( 'hb_payment_settings', 'hb_paypal_secret' );
+		register_setting( 'hb_payment_settings', 'hb_paypal_sandbox_client_id' );
+		register_setting( 'hb_payment_settings', 'hb_paypal_sandbox_secret' );
 
 		// Email Settings
 		register_setting( 'hb_email_settings', 'hb_confirmation_email' );

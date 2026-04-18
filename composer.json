@@ -1,0 +1,21 @@
+{
+	"name": "kaito2013/hotel-booking-wordpress",
+	"description": "Complete hotel booking system for WordPress",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=8.0",
+		"stripe/stripe-php": "^13.0",
+		"paypal/rest-api-sdk-php": "^1.14"
+	},
+	"autoload": {
+		"psr-4": {
+			"HotelBooking\\": "includes/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	}
+}

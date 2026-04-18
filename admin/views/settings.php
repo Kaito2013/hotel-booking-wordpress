@@ -177,6 +177,15 @@ $email_settings = array(
 						<input type="password" id="hb-stripe-live-secret" name="hb_stripe_live_secret" value="<?php echo esc_attr( $payment_settings['stripe_live_secret'] ); ?>" class="regular-text">
 					</td>
 				</tr>
+				<tr>
+					<th scope="row">
+						<label for="hb-stripe-webhook-secret"><?php esc_html_e( 'Webhook Secret', 'hotel-booking' ); ?></label>
+					</th>
+					<td>
+						<input type="password" id="hb-stripe-webhook-secret" name="hb_stripe_webhook_secret" value="<?php echo esc_attr( get_option( 'hb_stripe_webhook_secret', '' ) ); ?>" class="regular-text">
+						<p class="description"><?php esc_html_e( 'For verifying Stripe webhook signatures. Leave empty to skip verification (not recommended for production).', 'hotel-booking' ); ?></p>
+					</td>
+				</tr>
 			</table>
 
 			<p class="submit">
@@ -215,7 +224,7 @@ $email_settings = array(
 				</tr>
 				<tr>
 					<th scope="row">
-						<label for="hb-paypal-client-id"><?php esc_html_e( 'Client ID', 'hotel-booking' ); ?></label>
+						<label for="hb-paypal-client-id"><?php esc_html_e( 'Live Client ID', 'hotel-booking' ); ?></label>
 					</th>
 					<td>
 						<input type="text" id="hb-paypal-client-id" name="hb_paypal_client_id" value="<?php echo esc_attr( $payment_settings['paypal_client_id'] ); ?>" class="regular-text">
@@ -223,10 +232,28 @@ $email_settings = array(
 				</tr>
 				<tr>
 					<th scope="row">
-						<label for="hb-paypal-secret"><?php esc_html_e( 'Secret', 'hotel-booking' ); ?></label>
+						<label for="hb-paypal-secret"><?php esc_html_e( 'Live Secret', 'hotel-booking' ); ?></label>
 					</th>
 					<td>
 						<input type="password" id="hb-paypal-secret" name="hb_paypal_secret" value="<?php echo esc_attr( $payment_settings['paypal_secret'] ); ?>" class="regular-text">
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="hb-paypal-sandbox-client-id"><?php esc_html_e( 'Sandbox Client ID', 'hotel-booking' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="hb-paypal-sandbox-client-id" name="hb_paypal_sandbox_client_id" value="<?php echo esc_attr( get_option( 'hb_paypal_sandbox_client_id', '' ) ); ?>" class="regular-text">
+						<p class="description"><?php esc_html_e( 'For testing in sandbox mode', 'hotel-booking' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="hb-paypal-sandbox-secret"><?php esc_html_e( 'Sandbox Secret', 'hotel-booking' ); ?></label>
+					</th>
+					<td>
+						<input type="password" id="hb-paypal-sandbox-secret" name="hb_paypal_sandbox_secret" value="<?php echo esc_attr( get_option( 'hb_paypal_sandbox_secret', '' ) ); ?>" class="regular-text">
+						<p class="description"><?php esc_html_e( 'For testing in sandbox mode', 'hotel-booking' ); ?></p>
 					</td>
 				</tr>
 			</table>
