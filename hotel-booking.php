@@ -80,6 +80,8 @@ final class Hotel_Booking {
 			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-admin-dashboard.php';
 			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-admin-calendar.php';
 			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-room-metaboxes.php';
+			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-room-gallery.php';
+			require_once HOTEL_BOOKING_PLUGIN_DIR . 'admin/class-admin-reports.php';
 		}
 
 		// Payment gateways

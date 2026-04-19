@@ -1,0 +1,310 @@
+/* Admin Reports Styles */
+
+.hotel-booking-reports {
+	padding: 20px;
+}
+
+.hb-reports-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 20px 0;
+	padding: 15px 20px;
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+}
+
+.hb-period-filter {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.hb-period-filter select {
+	min-width: 150px;
+}
+
+.hb-reports-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.hb-reports-actions .button {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+/* Summary Cards */
+.hb-reports-summary {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 20px;
+	margin: 20px 0;
+}
+
+.hb-summary-card {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hb-summary-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hb-card-icon {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.hb-card-icon .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #fff;
+}
+
+.hb-icon-bookings {
+	background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+}
+
+.hb-icon-revenue {
+	background: linear-gradient(135deg, #00a32a 0%, #008a2d 100%);
+}
+
+.hb-icon-occupancy {
+	background: linear-gradient(135deg, #dba617 0%, #b8960c 100%);
+}
+
+.hb-icon-average {
+	background: linear-gradient(135deg, #d63638 0%, #b32d2e 100%);
+}
+
+.hb-card-content h3 {
+	margin: 0 0 5px;
+	font-size: 1.8em;
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.hb-card-content p {
+	margin: 0;
+	color: #646970;
+	font-size: 14px;
+}
+
+/* Charts */
+.hb-reports-charts {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+	margin: 20px 0;
+}
+
+.hb-chart-container {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+	padding: 20px;
+}
+
+.hb-chart-container h3 {
+	margin: 0 0 15px;
+	color: #1d2327;
+	font-size: 1.2em;
+}
+
+.hb-chart-container canvas {
+	width: 100% !important;
+	height: 300px !important;
+}
+
+/* Sections */
+.hb-reports-section {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+	padding: 20px;
+	margin: 20px 0;
+}
+
+.hb-reports-section h3 {
+	margin: 0 0 15px;
+	color: #1d2327;
+	font-size: 1.2em;
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 10px;
+}
+
+/* Status Distribution */
+.hb-status-distribution {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.hb-status-item {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.hb-status-bar {
+	height: 8px;
+	border-radius: 4px;
+	min-width: 20px;
+	transition: width 0.3s ease;
+}
+
+.hb-status-info {
+	display: flex;
+	justify-content: space-between;
+	min-width: 120px;
+}
+
+.hb-status-label {
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.hb-status-count {
+	color: #646970;
+}
+
+/* Status Badges */
+.hb-status-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.hb-status-pending {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.hb-status-confirmed {
+	background: #cce5ff;
+	color: #004085;
+}
+
+.hb-status-cancelled {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.hb-status-completed {
+	background: #d4edda;
+	color: #155724;
+}
+
+/* Loading State */
+.hb-reports-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 20px;
+	color: #646970;
+}
+
+.hb-reports-loading .spinner {
+	margin-right: 10px;
+}
+
+/* Responsive */
+@media screen and (max-width: 1200px) {
+	.hb-reports-summary {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.hb-reports-charts {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.hb-reports-header {
+		flex-direction: column;
+		gap: 15px;
+	}
+
+	.hb-period-filter {
+		width: 100%;
+	}
+
+	.hb-period-filter select {
+		flex: 1;
+	}
+
+	.hb-reports-summary {
+		grid-template-columns: 1fr;
+	}
+
+	.hb-summary-card {
+		padding: 15px;
+	}
+
+	.hb-card-icon {
+		width: 50px;
+		height: 50px;
+	}
+
+	.hb-card-icon .dashicons {
+		font-size: 24px;
+		width: 24px;
+		height: 24px;
+	}
+
+	.hb-card-content h3 {
+		font-size: 1.5em;
+	}
+
+	.hb-chart-container canvas {
+		height: 250px !important;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.hotel-booking-reports {
+		padding: 10px;
+	}
+
+	.hb-reports-header {
+		padding: 10px 15px;
+	}
+
+	.hb-period-filter {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.hb-period-filter select {
+		width: 100%;
+	}
+
+	.hb-summary-card {
+		flex-direction: column;
+		text-align: center;
+	}
+
+	.hb-card-content h3 {
+		font-size: 1.3em;
+	}
+}
