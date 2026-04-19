@@ -1,0 +1,167 @@
+/* Export Styles */
+
+.hotel-booking-export {
+	padding: 20px;
+}
+
+.hb-export-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin: 20px 0;
+}
+
+.hb-export-card {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+	padding: 25px;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hb-export-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hb-export-icon {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 15px;
+}
+
+.hb-export-icon .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #fff;
+}
+
+.hb-icon-bookings {
+	background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+}
+
+.hb-icon-rooms {
+	background: linear-gradient(135deg, #00a32a 0%, #008a2d 100%);
+}
+
+.hb-icon-revenue {
+	background: linear-gradient(135deg, #dba617 0%, #b8960c 100%);
+}
+
+.hb-icon-coupons {
+	background: linear-gradient(135deg, #d63638 0%, #b32d2e 100%);
+}
+
+.hb-icon-reviews {
+	background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+.hb-icon-guests {
+	background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.hb-export-card h3 {
+	margin: 0 0 10px;
+	color: #1d2327;
+}
+
+.hb-export-card p {
+	margin: 0 0 15px;
+	color: #646970;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.hb-export-filters {
+	margin: 15px 0;
+	padding: 15px;
+	background: #f6f7f7;
+	border-radius: 6px;
+}
+
+.hb-export-filters label {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: 600;
+	color: #1d2327;
+	font-size: 13px;
+}
+
+.hb-export-filters select {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.hb-export-filters select:last-child {
+	margin-bottom: 0;
+}
+
+.hb-export-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.hb-export-actions .button {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	flex: 1;
+	justify-content: center;
+}
+
+.hb-export-actions .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* Export Status */
+.hb-export-status {
+	margin: 20px 0;
+	padding: 20px;
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+}
+
+.hb-export-progress {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.hb-export-progress .spinner {
+	float: none;
+	margin: 0;
+}
+
+.hb-export-message {
+	color: #646970;
+}
+
+/* Responsive */
+@media screen and (max-width: 1200px) {
+	.hb-export-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.hb-export-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.hb-export-card {
+		padding: 20px;
+	}
+
+	.hb-export-actions {
+		flex-direction: column;
+	}
+}

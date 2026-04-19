@@ -1,0 +1,317 @@
+/* Reviews Styles */
+
+/* Admin Reviews */
+.hotel-booking-reviews {
+	padding: 20px;
+}
+
+.hb-reviews-stats {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin: 20px 0;
+}
+
+.hb-stat-card {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.hb-stat-card .dashicons {
+	font-size: 32px;
+	width: 32px;
+	height: 32px;
+	color: #2271b1;
+}
+
+.hb-stat-card .dashicons-star-filled {
+	color: #dba617;
+}
+
+.hb-stat-content h3 {
+	margin: 0;
+	font-size: 1.8em;
+	color: #1d2327;
+}
+
+.hb-stat-content p {
+	margin: 0;
+	color: #646970;
+}
+
+.hb-reviews-filters {
+	display: flex;
+	gap: 10px;
+	margin: 20px 0;
+}
+
+.hb-reviews-list {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.hb-review-item {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 8px;
+	padding: 20px;
+}
+
+.hb-review-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 10px;
+}
+
+.hb-review-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+}
+
+.hb-review-author {
+	color: #1d2327;
+}
+
+.hb-review-date {
+	color: #646970;
+	font-size: 14px;
+}
+
+.hb-review-room {
+	background: #f0f0f1;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	color: #646970;
+}
+
+.hb-verified-badge {
+	background: #d4edda;
+	color: #155724;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.hb-review-rating .dashicons {
+	color: #ddd;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.hb-review-rating .dashicons.filled {
+	color: #dba617;
+}
+
+.hb-review-content h4 {
+	margin: 0 0 8px;
+	color: #1d2327;
+}
+
+.hb-review-content p {
+	margin: 0;
+	color: #646970;
+	line-height: 1.6;
+}
+
+.hb-review-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #ddd;
+}
+
+.hb-approved-label {
+	color: #28a745;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.hb-no-reviews {
+	text-align: center;
+	padding: 60px 20px;
+	color: #646970;
+}
+
+.hb-no-reviews .dashicons {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	margin-bottom: 10px;
+	color: #c3c4c7;
+}
+
+/* Frontend Reviews */
+.hb-reviews-container {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.hb-reviews-summary {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 8px;
+	margin-bottom: 20px;
+}
+
+.hb-avg-rating {
+	font-size: 2.5em;
+	font-weight: 700;
+	color: #1d2327;
+}
+
+.hb-stars {
+	display: flex;
+	gap: 2px;
+}
+
+.hb-stars .dashicons {
+	color: #ddd;
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.hb-stars .dashicons.filled {
+	color: #dba617;
+}
+
+.hb-review-count {
+	color: #646970;
+}
+
+.hb-review-card {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 15px;
+}
+
+/* Review Form */
+.hb-review-form-container {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 30px;
+}
+
+.hb-review-form-container h3 {
+	margin: 0 0 20px;
+	color: #1d2327;
+}
+
+.hb-form-group {
+	margin-bottom: 20px;
+}
+
+.hb-form-group label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.hb-form-input,
+.hb-form-textarea {
+	width: 100%;
+	padding: 12px 15px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 16px;
+	box-sizing: border-box;
+}
+
+.hb-form-input:focus,
+.hb-form-textarea:focus {
+	border-color: #2271b1;
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.2);
+}
+
+.hb-form-row {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+}
+
+/* Star Rating */
+.hb-star-rating {
+	display: flex;
+	gap: 5px;
+}
+
+.hb-star-rating .star {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #ddd;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.hb-star-rating .star:hover,
+.hb-star-rating .star.active {
+	color: #dba617;
+}
+
+.hb-submit-review-btn {
+	display: block;
+	width: 100%;
+	padding: 14px 30px;
+	background: #2271b1;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.hb-submit-review-btn:hover {
+	background: #135e96;
+}
+
+.hb-submit-review-btn:disabled {
+	background: #a7aaad;
+	cursor: not-allowed;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+	.hb-reviews-stats {
+		grid-template-columns: 1fr;
+	}
+
+	.hb-reviews-filters {
+		flex-direction: column;
+	}
+
+	.hb-form-row {
+		grid-template-columns: 1fr;
+	}
+
+	.hb-review-header {
+		flex-direction: column;
+		gap: 10px;
+	}
+}

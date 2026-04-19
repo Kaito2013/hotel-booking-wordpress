@@ -100,6 +100,18 @@ final class Hotel_Booking {
 
 		// Frontend
 		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-frontend.php';
+
+		// Coupon Manager
+		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-coupon-manager.php';
+
+		// Reviews Manager
+		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-reviews-manager.php';
+
+		// Seasonal Pricing
+		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-seasonal-pricing.php';
+
+		// Export Manager
+		require_once HOTEL_BOOKING_PLUGIN_DIR . 'includes/class-export-manager.php';
 	}
 
 	/**
